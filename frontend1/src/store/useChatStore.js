@@ -10,11 +10,12 @@ export const useChatStore = create((set, get) => ({
   isUsersLoading: false,
   isMessagesLoading: false,
 
+  // Fetch users safely
   getUsers: async () => {
     set({ isUsersLoading: true });
     try {
       const res = await axiosInstance.get("/message/users");
-      set({ users: res.data });
+      set({ users: Array.isArray(res.data) ? res.data : [] });
     } catch (error) {
       toast.error(error?.response?.data?.message || "Failed to fetch users");
     } finally {
@@ -22,12 +23,13 @@ export const useChatStore = create((set, get) => ({
     }
   },
 
+  // Fetch messages safely
   getMessages: async (userId) => {
     if (!userId) return;
     set({ isMessagesLoading: true });
     try {
       const res = await axiosInstance.get(`/message/${userId}`);
-      set({ messages: res.data });
+      set({ messages: Array.isArray(res.data) ? res.data : [] });
     } catch (error) {
       toast.error(error?.response?.data?.message || "Failed to fetch messages");
     } finally {
@@ -35,13 +37,14 @@ export const useChatStore = create((set, get) => ({
     }
   },
 
+  // Send a message via API
   sendMessage: async (messageData) => {
-    const { selectedUser, messages } = get();
+    const { selectedUser } = get();
     if (!selectedUser) return;
-    
+
     try {
       const res = await axiosInstance.post(`/message/send/${selectedUser._id}`, messageData);
-      // Don't add to messages here as it will be added via socket
+      // Message will be added via socket
       return res.data;
     } catch (error) {
       toast.error(error?.response?.data?.message || "Failed to send message");
@@ -49,16 +52,16 @@ export const useChatStore = create((set, get) => ({
     }
   },
 
+  // Add message safely
   addMessage: (newMessage) => {
     const { messages, selectedUser } = get();
     const { authUser } = useAuthStore.getState();
-    
-    // Only add message if it's from the selected user or to the selected user
-    if (newMessage.senderId === selectedUser?._id || 
-        newMessage.receiverId === selectedUser?._id ||
-        newMessage.senderId === authUser?._id) {
-      
-      // Check if message already exists
+
+    if (
+      newMessage.senderId === selectedUser?._id ||
+      newMessage.receiverId === selectedUser?._id ||
+      newMessage.senderId === authUser?._id
+    ) {
       const messageExists = messages.some(msg => msg._id === newMessage._id);
       if (!messageExists) {
         set({ messages: [...messages, newMessage] });
@@ -66,6 +69,7 @@ export const useChatStore = create((set, get) => ({
     }
   },
 
+  // Subscribe to socket messages
   subscribeToMessages: () => {
     const socket = useAuthStore.getState().socket;
     if (!socket) {
@@ -73,15 +77,16 @@ export const useChatStore = create((set, get) => ({
       return;
     }
 
-    // Remove any existing listeners to prevent duplicates
+    // Remove previous listeners
     socket.off("newMessage");
-    
+
     // Add new message listener
     socket.on("newMessage", (newMessage) => {
       get().addMessage(newMessage);
     });
   },
 
+  // Unsubscribe from socket messages
   unsubscribeFromMessages: () => {
     const socket = useAuthStore.getState().socket;
     if (!socket) {
@@ -91,9 +96,10 @@ export const useChatStore = create((set, get) => ({
     socket.off("newMessage");
   },
 
+  // Set selected user and fetch messages
   setSelectedUser: (selectedUser) => {
     set({ selectedUser });
-    if (selectedUser) {
+    if (selectedUser?._id) {
       get().getMessages(selectedUser._id);
     }
   },
