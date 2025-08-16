@@ -14,10 +14,13 @@ export const createSocketServer = (app) => {
     const server = http.createServer(app)
     
     io = new Server(server ,{
-        cors: {
-            origin: "http://localhost:5173",
-            credentials: true
-        }
+       cors: {
+  origin: process.env.NODE_ENV === "production"
+    ? "https://fullstack-app-sxv1.onrender.com"
+    : "http://localhost:5173",
+  credentials: true
+}
+
     });
     
     io.on("connection", (socket)=>{
