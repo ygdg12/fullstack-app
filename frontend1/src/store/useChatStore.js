@@ -23,12 +23,12 @@ export const useChatStore = create((set, get) => ({
     }
   },
 
-  // Fetch messages
+  // Fetch messages for selected user
   getMessages: async (userId) => {
     if (!userId) return;
     set({ isMessagesLoading: true });
     try {
-      const res = await axiosInstance.get(`/message/${userId}`);
+      const res = await axiosInstance.get(`/message/chat/${userId}`);
       set({ messages: Array.isArray(res.data) ? res.data : [] });
     } catch (error) {
       toast.error(error?.response?.data?.message || "Failed to fetch messages");
@@ -37,21 +37,26 @@ export const useChatStore = create((set, get) => ({
     }
   },
 
-  // Send message
+  // Send a message and add to store immediately
   sendMessage: async (messageData) => {
-    const { selectedUser } = get();
+    const { selectedUser, messages } = get();
     if (!selectedUser) return;
 
     try {
       const res = await axiosInstance.post(`/message/send/${selectedUser._id}`, messageData);
-      return res.data; // new message handled by socket
+      const newMessage = res.data;
+
+      // Add new message to store immediately
+      set({ messages: [...messages, newMessage] });
+
+      return newMessage;
     } catch (error) {
       toast.error(error?.response?.data?.message || "Failed to send message");
       throw error;
     }
   },
 
-  // Add new message (from socket)
+  // Add message safely (for socket)
   addMessage: (newMessage) => {
     const { messages, selectedUser } = get();
     const { authUser } = useAuthStore.getState();
@@ -61,7 +66,7 @@ export const useChatStore = create((set, get) => ({
       newMessage.receiverId === selectedUser?._id ||
       newMessage.senderId === authUser?._id
     ) {
-      const exists = messages.some((msg) => msg._id === newMessage._id);
+      const exists = messages.some(msg => msg._id === newMessage._id);
       if (!exists) set({ messages: [...messages, newMessage] });
     }
   },
@@ -69,7 +74,7 @@ export const useChatStore = create((set, get) => ({
   // Socket subscription
   subscribeToMessages: () => {
     const socket = useAuthStore.getState().socket;
-    if (!socket) return console.warn("Socket not initialized");
+    if (!socket) return;
 
     socket.off("newMessage");
     socket.on("newMessage", (newMessage) => {
@@ -83,8 +88,9 @@ export const useChatStore = create((set, get) => ({
     socket.off("newMessage");
   },
 
-  setSelectedUser: (user) => {
-    set({ selectedUser: user });
-    if (user?._id) get().getMessages(user._id);
+  // Select a user
+  setSelectedUser: (selectedUser) => {
+    set({ selectedUser });
+    if (selectedUser?._id) get().getMessages(selectedUser._id);
   },
 }));
