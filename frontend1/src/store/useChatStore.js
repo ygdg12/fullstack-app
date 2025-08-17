@@ -10,7 +10,7 @@ export const useChatStore = create((set, get) => ({
   isUsersLoading: false,
   isMessagesLoading: false,
 
-  // Fetch users safely
+  // Fetch all users you can chat with
   getUsers: async () => {
     set({ isUsersLoading: true });
     try {
@@ -23,7 +23,7 @@ export const useChatStore = create((set, get) => ({
     }
   },
 
-  // Fetch messages safely
+  // Fetch conversation with a specific user
   getMessages: async (userId) => {
     if (!userId) return;
     set({ isMessagesLoading: true });
@@ -37,14 +37,17 @@ export const useChatStore = create((set, get) => ({
     }
   },
 
-  // Send a message via API
+  // Send a message to the selected user
   sendMessage: async (messageData) => {
     const { selectedUser } = get();
     if (!selectedUser) return;
 
     try {
-      const res = await axiosInstance.post(`/message/send/${selectedUser._id}`, messageData);
-      // Message will be added via socket
+      const res = await axiosInstance.post(
+        `/message/send/${selectedUser._id}`,
+        messageData
+      );
+      // No need to manually push here (handled via socket)
       return res.data;
     } catch (error) {
       toast.error(error?.response?.data?.message || "Failed to send message");
@@ -52,24 +55,25 @@ export const useChatStore = create((set, get) => ({
     }
   },
 
-  // Add message safely
+  // Add a new message into state safely (from socket or local)
   addMessage: (newMessage) => {
     const { messages, selectedUser } = get();
     const { authUser } = useAuthStore.getState();
 
+    // Only add if message belongs to the active conversation
     if (
       newMessage.senderId === selectedUser?._id ||
       newMessage.receiverId === selectedUser?._id ||
       newMessage.senderId === authUser?._id
     ) {
-      const messageExists = messages.some(msg => msg._id === newMessage._id);
-      if (!messageExists) {
+      const exists = messages.some((msg) => msg._id === newMessage._id);
+      if (!exists) {
         set({ messages: [...messages, newMessage] });
       }
     }
   },
 
-  // Subscribe to socket messages
+  // Subscribe to incoming socket messages
   subscribeToMessages: () => {
     const socket = useAuthStore.getState().socket;
     if (!socket) {
@@ -77,16 +81,15 @@ export const useChatStore = create((set, get) => ({
       return;
     }
 
-    // Remove previous listeners
+    // Remove previous listener to avoid duplicates
     socket.off("newMessage");
 
-    // Add new message listener
     socket.on("newMessage", (newMessage) => {
       get().addMessage(newMessage);
     });
   },
 
-  // Unsubscribe from socket messages
+  // Unsubscribe when component unmounts or user changes
   unsubscribeFromMessages: () => {
     const socket = useAuthStore.getState().socket;
     if (!socket) {
@@ -96,11 +99,13 @@ export const useChatStore = create((set, get) => ({
     socket.off("newMessage");
   },
 
-  // Set selected user and fetch messages
+  // Select a user and immediately fetch conversation
   setSelectedUser: (selectedUser) => {
     set({ selectedUser });
     if (selectedUser?._id) {
       get().getMessages(selectedUser._id);
+    } else {
+      set({ messages: [] });
     }
   },
 }));
