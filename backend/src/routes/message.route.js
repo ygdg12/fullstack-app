@@ -1,13 +1,16 @@
-import express from "express"
+import express from "express";
 import { protectRoute } from "../middleware/auth.middleware.js";
-import { getUserForSidebar,getMessages,sendMessages  } from "../controllers/message.controller.js";
-const router = express.Router()
+import { getUserForSidebar, getMessages, sendMessages } from "../controllers/message.controller.js";
 
-router.get("/users",protectRoute,getUserForSidebar)
+const router = express.Router();
 
-router.get("/chat/:id", protectRoute, getMessages); // ✅ More specific
+// Fetch all users for sidebar (excluding self)
+router.get("/users", protectRoute, getUserForSidebar);
 
+// Fetch chat messages with a specific user
+router.get("/chat/:id", protectRoute, getMessages);
 
-router.post("/send/:id",protectRoute,sendMessages )
+// Send a new message (text + optional image)
+router.post("/send/:id", protectRoute, sendMessages);
 
 export default router;
