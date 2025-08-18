@@ -5,8 +5,9 @@ import ChatHeader from "./ChatHeader";
 import MessageInput from "./MessageInput";
 import MessageSkeleton from "./skeletons/MessageSkeleton";
 import { formatMessageTime } from "../lib/utils";
+import { ArrowLeft } from "lucide-react";
 
-const ChatContainer = () => {
+const ChatContainer = ({ setIsSidebarOpen }) => {
   const {
     messages,
     getMessages,
@@ -60,12 +61,25 @@ const ChatContainer = () => {
 
   return (
     <div className="flex-1 flex-col overflow-auto">
-      <ChatHeader />
+      {/* Chat Header with Back Button on Mobile */}
+      <div className="flex items-center gap-2 p-2 border-b border-base-300">
+        <button
+          onClick={() => setIsSidebarOpen(true)}
+          className="lg:hidden p-2 rounded-full hover:bg-base-300"
+        >
+          <ArrowLeft size={20} />
+        </button>
+        <ChatHeader />
+      </div>
+
+      {/* Messages */}
       <div className="flex-1 overflow-auto p-4 space-y-4">
         {messages?.map((message, idx) => (
           <div
             key={message._id}
-            className={`chat ${message.senderId === authUser._id ? "chat-end" : "chat-start"}`}
+            className={`chat ${
+              message.senderId === authUser._id ? "chat-end" : "chat-start"
+            }`}
             ref={idx === messages.length - 1 ? messageEndRef : null}
           >
             <div className="chat-image avatar">
@@ -99,6 +113,8 @@ const ChatContainer = () => {
           </div>
         ))}
       </div>
+
+      {/* Input */}
       <MessageInput />
     </div>
   );
