@@ -5,8 +5,9 @@ import ChatHeader from "./ChatHeader";
 import MessageInput from "./MessageInput";
 import MessageSkeleton from "./skeletons/MessageSkeleton";
 import { formatMessageTime } from "../lib/utils";
+import { ArrowLeft } from "lucide-react";
 
-const ChatContainer = () => {
+const ChatContainer = ({ isSidebarOpen, setIsSidebarOpen }) => {
   const {
     messages,
     getMessages,
@@ -39,6 +40,7 @@ const ChatContainer = () => {
     }
   }, [messages]);
 
+  // Loading state
   if (isMessagesLoading)
     return (
       <div className="flex-1 flex flex-col overflow-hidden">
@@ -48,6 +50,7 @@ const ChatContainer = () => {
       </div>
     );
 
+  // No user selected
   if (!selectedUser)
     return (
       <div className="flex-1 flex items-center justify-center">
@@ -56,18 +59,25 @@ const ChatContainer = () => {
     );
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden">
-      {/* Header */}
-      <ChatHeader />
+    <div className={`flex-1 flex flex-col overflow-hidden ${isSidebarOpen ? "hidden lg:flex" : "flex"}`}>
+      {/* Header with mobile back button */}
+      <div className="flex items-center gap-2 p-2 border-b border-base-300">
+        <button
+          onClick={() => setIsSidebarOpen(true)}
+          className="lg:hidden p-2 rounded-full hover:bg-base-300"
+          aria-label="Open sidebar"
+        >
+          <ArrowLeft size={20} />
+        </button>
+        <ChatHeader />
+      </div>
 
       {/* Messages */}
       <div className="flex-1 overflow-auto p-4 space-y-4">
         {messages?.map((message, idx) => (
           <div
             key={message._id}
-            className={`chat ${
-              message.senderId === authUser._id ? "chat-end" : "chat-start"
-            }`}
+            className={`chat ${message.senderId === authUser._id ? "chat-end" : "chat-start"}`}
             ref={idx === messages.length - 1 ? messageEndRef : null}
           >
             <div className="chat-image avatar">
@@ -84,9 +94,7 @@ const ChatContainer = () => {
               </div>
             </div>
             <div className="chat-header mb-1">
-              <time className="text-xs opacity-50 ml-1">
-                {formatMessageTime(message.createdAt)}
-              </time>
+              <time className="text-xs opacity-50 ml-1">{formatMessageTime(message.createdAt)}</time>
             </div>
             <div className="chat-bubble flex flex-col">
               {message.image && (
