@@ -5,9 +5,8 @@ import ChatHeader from "./ChatHeader";
 import MessageInput from "./MessageInput";
 import MessageSkeleton from "./skeletons/MessageSkeleton";
 import { formatMessageTime } from "../lib/utils";
-import { ArrowLeft } from "lucide-react";
 
-const ChatContainer = ({ isSidebarOpen, setIsSidebarOpen }) => {
+const ChatContainer = () => {
   const {
     messages,
     getMessages,
@@ -20,12 +19,12 @@ const ChatContainer = ({ isSidebarOpen, setIsSidebarOpen }) => {
   const { authUser } = useAuthStore();
   const messageEndRef = useRef(null);
 
-  // Fetch messages when user selected
+  // Fetch messages when a user is selected
   useEffect(() => {
     if (selectedUser) getMessages(selectedUser._id);
   }, [selectedUser, getMessages]);
 
-  // Subscribe/unsubscribe socket
+  // Subscribe/unsubscribe to socket
   useEffect(() => {
     if (selectedUser) {
       subscribeToMessages();
@@ -40,7 +39,6 @@ const ChatContainer = ({ isSidebarOpen, setIsSidebarOpen }) => {
     }
   }, [messages]);
 
-  // Loading state
   if (isMessagesLoading)
     return (
       <div className="flex-1 flex flex-col overflow-hidden">
@@ -50,29 +48,17 @@ const ChatContainer = ({ isSidebarOpen, setIsSidebarOpen }) => {
       </div>
     );
 
-  // No user selected
   if (!selectedUser)
     return (
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <div className="flex-1 flex items-center justify-center">
-          <p className="text-base-content/70">Select a user to start chatting</p>
-        </div>
+      <div className="flex-1 flex items-center justify-center">
+        <p className="text-base-content/70">Select a user to start chatting</p>
       </div>
     );
 
   return (
-    <div className={`flex-1 flex flex-col overflow-hidden ${isSidebarOpen ? "hidden lg:flex" : "flex"}`}>
-      {/* Chat Header with Back Button on Mobile */}
-      <div className="flex items-center gap-2 p-2 border-b border-base-300">
-        <button
-          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          className="lg:hidden p-2 rounded-full hover:bg-base-300"
-          aria-label="Toggle sidebar"
-        >
-          <ArrowLeft size={20} />
-        </button>
-        <ChatHeader />
-      </div>
+    <div className="flex-1 flex flex-col overflow-hidden">
+      {/* Header */}
+      <ChatHeader />
 
       {/* Messages */}
       <div className="flex-1 overflow-auto p-4 space-y-4">
