@@ -25,7 +25,7 @@ const ChatContainer = ({ isSidebarOpen, setIsSidebarOpen }) => {
     if (selectedUser) getMessages(selectedUser._id);
   }, [selectedUser, getMessages]);
 
-  // Subscribe/unsubscribe to socket
+  // Subscribe/unsubscribe to socket messages
   useEffect(() => {
     if (selectedUser) {
       subscribeToMessages();
@@ -33,7 +33,7 @@ const ChatContainer = ({ isSidebarOpen, setIsSidebarOpen }) => {
     }
   }, [selectedUser, subscribeToMessages, unsubscribeFromMessages]);
 
-  // Scroll to latest message
+  // Scroll to the latest message
   useEffect(() => {
     if (messageEndRef.current) {
       messageEndRef.current.scrollIntoView({ behavior: "smooth" });
@@ -59,9 +59,13 @@ const ChatContainer = ({ isSidebarOpen, setIsSidebarOpen }) => {
     );
 
   return (
-    <div className={`flex-1 flex flex-col overflow-hidden ${isSidebarOpen ? "hidden lg:flex" : "flex"}`}>
-      {/* Header with mobile back button */}
+    <div
+      className={`flex-1 flex flex-col overflow-hidden 
+        ${isSidebarOpen ? "hidden lg:flex" : "flex"}`}
+    >
+      {/* Chat Header */}
       <div className="flex items-center gap-2 p-2 border-b border-base-300">
+        {/* Show back button only on mobile */}
         <button
           onClick={() => setIsSidebarOpen(true)}
           className="lg:hidden p-2 rounded-full hover:bg-base-300"
@@ -77,7 +81,9 @@ const ChatContainer = ({ isSidebarOpen, setIsSidebarOpen }) => {
         {messages?.map((message, idx) => (
           <div
             key={message._id}
-            className={`chat ${message.senderId === authUser._id ? "chat-end" : "chat-start"}`}
+            className={`chat ${
+              message.senderId === authUser._id ? "chat-end" : "chat-start"
+            }`}
             ref={idx === messages.length - 1 ? messageEndRef : null}
           >
             <div className="chat-image avatar">
@@ -94,7 +100,9 @@ const ChatContainer = ({ isSidebarOpen, setIsSidebarOpen }) => {
               </div>
             </div>
             <div className="chat-header mb-1">
-              <time className="text-xs opacity-50 ml-1">{formatMessageTime(message.createdAt)}</time>
+              <time className="text-xs opacity-50 ml-1">
+                {formatMessageTime(message.createdAt)}
+              </time>
             </div>
             <div className="chat-bubble flex flex-col">
               {message.image && (
@@ -111,7 +119,7 @@ const ChatContainer = ({ isSidebarOpen, setIsSidebarOpen }) => {
         ))}
       </div>
 
-      {/* Input */}
+      {/* Message Input */}
       <MessageInput />
     </div>
   );
