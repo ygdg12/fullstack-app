@@ -33,7 +33,7 @@ const ChatContainer = ({ setIsSidebarOpen }) => {
     }
   }, [selectedUser, subscribeToMessages, unsubscribeFromMessages]);
 
-  // Scroll to latest
+  // Scroll to latest message
   useEffect(() => {
     if (messageEndRef.current) {
       messageEndRef.current.scrollIntoView({ behavior: "smooth" });
@@ -43,16 +43,17 @@ const ChatContainer = ({ setIsSidebarOpen }) => {
   // Loading state
   if (isMessagesLoading)
     return (
-      <div className="flex-1 flex-col overflow-auto">
+      <div className="flex-1 flex flex-col overflow-auto">
         <ChatHeader />
         <MessageSkeleton />
         <MessageInput />
       </div>
     );
 
+  // No user selected
   if (!selectedUser)
     return (
-      <div className="flex-1 flex-col overflow-auto">
+      <div className="flex-1 flex flex-col overflow-auto">
         <div className="flex-1 flex items-center justify-center">
           <p className="text-base-content/70">Select a user to start chatting</p>
         </div>
@@ -60,7 +61,7 @@ const ChatContainer = ({ setIsSidebarOpen }) => {
     );
 
   return (
-    <div className="flex-1 flex-col overflow-auto">
+    <div className="flex-1 flex flex-col overflow-hidden">
       {/* Chat Header with Back Button on Mobile */}
       <div className="flex items-center gap-2 p-2 border-b border-base-300">
         <button
@@ -91,6 +92,7 @@ const ChatContainer = ({ setIsSidebarOpen }) => {
                       : selectedUser.profilePic || "/avatar.png"
                   }
                   onError={(e) => (e.currentTarget.src = "/avatar.png")}
+                  alt="avatar"
                 />
               </div>
             </div>
