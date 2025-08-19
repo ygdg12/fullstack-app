@@ -43,7 +43,7 @@ const ChatContainer = ({ setIsSidebarOpen }) => {
   // Loading state
   if (isMessagesLoading)
     return (
-      <div className="flex-1 flex flex-col overflow-auto">
+      <div className="flex-1 flex flex-col overflow-hidden">
         <ChatHeader />
         <MessageSkeleton />
         <MessageInput />
@@ -53,13 +53,14 @@ const ChatContainer = ({ setIsSidebarOpen }) => {
   // No user selected
   if (!selectedUser)
     return (
-      <div className="flex-1 flex flex-col overflow-auto">
+      <div className="flex-1 flex flex-col overflow-hidden">
         <div className="flex-1 flex items-center justify-center">
           <p className="text-base-content/70">Select a user to start chatting</p>
         </div>
       </div>
     );
 
+  // ✅ Messages only — no sidebar/user list here
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
       {/* Chat Header with Back Button on Mobile */}
