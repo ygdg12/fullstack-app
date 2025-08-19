@@ -60,8 +60,9 @@ const ChatContainer = ({ isSidebarOpen, setIsSidebarOpen }) => {
 
   return (
     <div
-      className={`flex-1 flex flex-col overflow-hidden 
-        ${isSidebarOpen ? "hidden lg:flex" : "flex"}`}
+      className={`flex-1 flex flex-col overflow-hidden
+        ${!isSidebarOpen ? "lg:flex" : "lg:flex"} 
+        ${isSidebarOpen ? "block lg:block" : "block lg:block"}`}
     >
       {/* Chat Header */}
       <div className="flex items-center gap-2 p-2 border-b border-base-300">
