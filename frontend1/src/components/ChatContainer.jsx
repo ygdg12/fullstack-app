@@ -7,7 +7,7 @@ import MessageSkeleton from "./skeletons/MessageSkeleton";
 import { formatMessageTime } from "../lib/utils";
 import { ArrowLeft } from "lucide-react";
 
-const ChatContainer = ({ setIsSidebarOpen }) => {
+const ChatContainer = ({ isSidebarOpen, setIsSidebarOpen }) => {
   const {
     messages,
     getMessages,
@@ -60,14 +60,14 @@ const ChatContainer = ({ setIsSidebarOpen }) => {
       </div>
     );
 
-  // ✅ Messages only — no sidebar/user list here
   return (
-    <div className="flex-1 flex flex-col overflow-hidden">
+    <div className={`flex-1 flex flex-col overflow-hidden ${isSidebarOpen ? "hidden lg:flex" : "flex"}`}>
       {/* Chat Header with Back Button on Mobile */}
       <div className="flex items-center gap-2 p-2 border-b border-base-300">
         <button
-          onClick={() => setIsSidebarOpen(true)}
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
           className="lg:hidden p-2 rounded-full hover:bg-base-300"
+          aria-label="Toggle sidebar"
         >
           <ArrowLeft size={20} />
         </button>
