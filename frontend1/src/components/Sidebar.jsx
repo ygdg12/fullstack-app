@@ -23,13 +23,14 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
   return (
     <aside
       className={`
-        bg-base-100 z-50 fixed lg:static inset-y-0 left-0 transform
-        w-72 border-r border-base-300 flex flex-col transition-transform duration-200
-        ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} 
-        lg:translate-x-0
+        bg-base-100 fixed inset-y-0 left-0 w-72 border-r border-base-300 flex flex-col
+        transform transition-transform duration-300 ease-in-out
+        z-50
+        ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
+        lg:translate-x-0 lg:static lg:flex
       `}
     >
-      {/* Close button on mobile */}
+      {/* Close button for mobile */}
       <div className="lg:hidden p-2 border-b border-base-300 flex justify-end">
         <button
           onClick={() => setIsSidebarOpen(false)}
@@ -62,12 +63,15 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
         </div>
       </div>
 
-      {/* User list */}
+      {/* Users list */}
       <div className="overflow-y-auto w-full py-3 flex-1">
         {filteredUsers.map((user) => (
           <button
             key={user._id}
-            onClick={() => setSelectedUser(user)}
+            onClick={() => {
+              setSelectedUser(user);
+              setIsSidebarOpen(false); // auto-close on mobile
+            }}
             className={`
               w-full p-3 flex items-center gap-3
               hover:bg-base-300 transition-colors
@@ -98,7 +102,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
         ))}
 
         {filteredUsers.length === 0 && (
-          <div className="text-center text-zinc-500 py-4">No online users</div>
+          <div className="text-center text-zinc-500 py-4">No users</div>
         )}
       </div>
     </aside>
