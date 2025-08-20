@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React,{ useEffect, useRef } from "react";
 import { useChatStore } from "../store/useChatStore";
 import { useAuthStore } from "../store/useAuthStore";
 import ChatHeader from "./ChatHeader";
@@ -55,8 +55,8 @@ const ChatContainer = ({ isSidebarOpen, setIsSidebarOpen }) => {
     <div
       className={`
         flex-1 flex flex-col overflow-hidden
-        ${isSidebarOpen ? "hidden" : "flex"}   /* hide chat on mobile when sidebar open */
-        lg:flex                                /* always show chat on desktop */
+        ${isSidebarOpen ? "hidden" : "flex"}   /* hide chat when sidebar open on mobile */
+        lg:flex                                /* always show on desktop */
       `}
     >
       {/* Header */}

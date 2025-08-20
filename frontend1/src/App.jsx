@@ -1,6 +1,8 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 import Navbar from "./components/Navbar";
+import Sidebar from "./components/Sidebar";
+import ChatContainer from "./components/ChatContainer";
 
 import Homepage from "./pages/Homepage";
 import SignUpPage from "./pages/SignUpPage";
@@ -16,10 +18,9 @@ import { Loader } from "lucide-react";
 import { Toaster } from "react-hot-toast";
 
 const App = () => {
-  const { authUser, checkAuth, isCheckingAuth ,onlineUsers} = useAuthStore();
+  const { authUser, checkAuth, isCheckingAuth, onlineUsers } = useAuthStore();
   const { theme } = useThemeStore();
-
-  console.log(onlineUsers)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -33,8 +34,17 @@ const App = () => {
     );
 
   return (
-    <div data-theme={theme}>
+    <div data-theme={theme} className="h-screen flex flex-col">
       <Navbar />
+
+      <div className="flex flex-1 h-full overflow-hidden">
+        {/* Sidebar */}
+        <Sidebar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />
+
+        {/* Chat container */}
+        <ChatContainer isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />
+      </div>
+
       <Routes>
         <Route path="/" element={authUser ? <Homepage /> : <Navigate to="/login" />} />
         <Route path="/signup" element={!authUser ? <SignUpPage /> : <Navigate to="/" />} />
@@ -42,8 +52,10 @@ const App = () => {
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/profile" element={authUser ? <ProfilePage /> : <Navigate to="/login" />} />
       </Routes>
+
       <Toaster />
     </div>
   );
 };
+
 export default App;
