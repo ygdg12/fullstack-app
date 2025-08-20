@@ -5,7 +5,7 @@ import ChatHeader from "./ChatHeader";
 import MessageInput from "./MessageInput";
 import MessageSkeleton from "./skeletons/MessageSkeleton";
 import { formatMessageTime } from "../lib/utils";
-import { ArrowLeft } from "lucide-react";
+import { Menu } from "lucide-react";
 
 const ChatContainer = ({ isSidebarOpen, setIsSidebarOpen }) => {
   const {
@@ -20,12 +20,12 @@ const ChatContainer = ({ isSidebarOpen, setIsSidebarOpen }) => {
   const { authUser } = useAuthStore();
   const messageEndRef = useRef(null);
 
-  // Fetch messages when a user is selected
+  // Fetch messages when user selected
   useEffect(() => {
     if (selectedUser) getMessages(selectedUser._id);
   }, [selectedUser, getMessages]);
 
-  // Subscribe/unsubscribe to socket messages
+  // Subscribe/unsubscribe socket
   useEffect(() => {
     if (selectedUser) {
       subscribeToMessages();
@@ -33,14 +33,13 @@ const ChatContainer = ({ isSidebarOpen, setIsSidebarOpen }) => {
     }
   }, [selectedUser, subscribeToMessages, unsubscribeFromMessages]);
 
-  // Scroll to the latest message
+  // Scroll to latest message
   useEffect(() => {
     if (messageEndRef.current) {
       messageEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
 
-  // Loading state
   if (isMessagesLoading)
     return (
       <div className="flex-1 flex flex-col overflow-hidden">
@@ -50,29 +49,25 @@ const ChatContainer = ({ isSidebarOpen, setIsSidebarOpen }) => {
       </div>
     );
 
-  // No user selected
-  if (!selectedUser)
-    return (
-      <div className="flex-1 flex items-center justify-center">
-        <p className="text-base-content/70">Select a user to start chatting</p>
-      </div>
-    );
+  if (!selectedUser) return null;
 
   return (
     <div
-      className={`flex-1 flex flex-col overflow-hidden 
-  ${isSidebarOpen ? "hidden" : "flex"} lg:flex`}
-
+      className={`
+        flex-1 flex flex-col overflow-hidden
+        ${isSidebarOpen ? "hidden" : "flex"}   /* hide chat when sidebar open on mobile */
+        lg:flex                                /* always show on desktop */
+      `}
     >
-      {/* Chat Header */}
+      {/* Header */}
       <div className="flex items-center gap-2 p-2 border-b border-base-300">
-        {/* Back button only on mobile */}
+        {/* Mobile menu button */}
         <button
           onClick={() => setIsSidebarOpen(true)}
           className="lg:hidden p-2 rounded-full hover:bg-base-300"
           aria-label="Open sidebar"
         >
-          <ArrowLeft size={20} />
+          <Menu size={20} />
         </button>
         <ChatHeader />
       </div>
@@ -120,7 +115,7 @@ const ChatContainer = ({ isSidebarOpen, setIsSidebarOpen }) => {
         ))}
       </div>
 
-      {/* Message Input */}
+      {/* Input */}
       <MessageInput />
     </div>
   );

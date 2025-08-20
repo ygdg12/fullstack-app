@@ -23,8 +23,8 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
     <aside
       className={`
         h-full w-64 lg:w-72 border-r border-base-300 flex flex-col transition-all duration-200
-        ${isSidebarOpen ? "flex" : "hidden"}   /* mobile: toggle */
-        lg:flex                               /* desktop: always visible */
+        ${isSidebarOpen ? "flex" : "hidden"}   /* mobile toggle */
+        lg:flex                                /* always show on desktop */
       `}
     >
       {/* Mobile Close Button */}
@@ -67,7 +67,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
             key={user._id}
             onClick={() => {
               setSelectedUser(user);
-              setIsSidebarOpen(false); // auto-close on mobile after selecting
+              setIsSidebarOpen(false); // auto close on mobile
             }}
             className={`
               w-full p-3 flex items-center gap-3
