@@ -1,4 +1,4 @@
-import React,{ useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { useChatStore } from "../store/useChatStore";
 import { useAuthStore } from "../store/useAuthStore";
 import ChatHeader from "./ChatHeader";
@@ -20,12 +20,10 @@ const ChatContainer = ({ isSidebarOpen, setIsSidebarOpen }) => {
   const { authUser } = useAuthStore();
   const messageEndRef = useRef(null);
 
-  // Fetch messages when user selected
   useEffect(() => {
     if (selectedUser) getMessages(selectedUser._id);
   }, [selectedUser, getMessages]);
 
-  // Subscribe/unsubscribe socket
   useEffect(() => {
     if (selectedUser) {
       subscribeToMessages();
@@ -33,7 +31,6 @@ const ChatContainer = ({ isSidebarOpen, setIsSidebarOpen }) => {
     }
   }, [selectedUser, subscribeToMessages, unsubscribeFromMessages]);
 
-  // Scroll to latest message
   useEffect(() => {
     if (messageEndRef.current) {
       messageEndRef.current.scrollIntoView({ behavior: "smooth" });
@@ -55,13 +52,12 @@ const ChatContainer = ({ isSidebarOpen, setIsSidebarOpen }) => {
     <div
       className={`
         flex-1 flex flex-col overflow-hidden
-        ${isSidebarOpen ? "hidden" : "flex"}   /* hide chat when sidebar open on mobile */
-        lg:flex                                /* always show on desktop */
+        ${isSidebarOpen ? "hidden" : "flex"}
+        lg:flex
       `}
     >
       {/* Header */}
       <div className="flex items-center gap-2 p-2 border-b border-base-300">
-        {/* Mobile menu button */}
         <button
           onClick={() => setIsSidebarOpen(true)}
           className="lg:hidden p-2 rounded-full hover:bg-base-300"
